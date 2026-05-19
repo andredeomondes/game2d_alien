@@ -4,58 +4,56 @@ from abc import ABC, abstractmethod
 class Pedido:
     """Representa um pedido com um valor total."""
 
-    def __init__(self, valor_total: float) -> None:
-        self.valor_total = valor_total
+    def __init__(self, valor: float) -> None:
+        self.valor = valor
 
-    def get_valor_total(self) -> float:
-        return self.valor_total
+    def get_valor(self) -> float:
+        return self.valor
 
 
 class Desconto(ABC):
-    """Interface para diferentes estratégias de desconto."""
+    """Classe base para todos os tipos de desconto."""
 
     @abstractmethod
-    def calcular(self, pedido: Pedido) -> float:
+    def calcular(self, valor: float) -> float:
         pass
 
 
 class DescontoFixo(Desconto):
-    """Aplica um desconto de valor fixo (ex: R$ 10,00)."""
+    """Subtrai um valor fixo (ex: R$ 20,00 off)."""
 
     def __init__(self, valor_desconto: float) -> None:
         self.valor_desconto = valor_desconto
 
-    def calcular(self, pedido: Pedido) -> float:
-        return self.valor_desconto
+    def calcular(self, valor: float) -> float:
+        return valor - self.valor_desconto
 
 
 class DescontoPercentual(Desconto):
-    """Aplica um desconto baseado em porcentagem (ex: 10%)."""
+    """Subtrai uma porcentagem (ex: 10% off)."""
 
     def __init__(self, porcentagem: float) -> None:
         self.porcentagem = porcentagem
 
-    def calcular(self, pedido: Pedido) -> float:
-        return pedido.valor_total * (self.porcentagem / 100)
+    def calcular(self, valor: float) -> float:
+        return valor * (1 - self.porcentagem / 100)
 
 
 class DescontoApp:
-    """Classe que executa a aplicação do desconto no pedido."""
+    """Orquestra a aplicação do desconto sobre o pedido."""
 
-    def __init__(self, pedido: Pedido, estrategia_desconto: Desconto) -> None:
+    def __init__(self, pedido: Pedido, desconto_estrategia: Desconto) -> None:
         self.pedido = pedido
-        self.estrategia_desconto = estrategia_desconto
+        self.desconto_estrategia = desconto_estrategia
 
-    def calcular_valor_final(self) -> float:
-        valor_desconto = self.estrategia_desconto.calcular(self.pedido)
-        valor_final = self.pedido.valor_total - valor_desconto
-        return max(0, valor_final)
+    def calcular_total_com_desconto(self) -> float:
+        valor_original = self.pedido.get_valor()
+        return self.desconto_estrategia.calcular(valor_original)
 
 
 if __name__ == "__main__":
-    meu_pedido = Pedido(100.0)
+    meu_pedido = Pedido(500.0)
+    meu_desconto = DescontoPercentual(20)
 
-    regra_15 = DescontoPercentual(15)
-
-    app = DescontoApp(meu_pedido, regra_15)
-    print(f"Valor Final com Desconto: R$ {app.calcular_valor_final()}")
+    app = DescontoApp(meu_pedido, meu_desconto)
+    print(f"Total a pagar: R$ {app.calcular_total_com_desconto()}")
