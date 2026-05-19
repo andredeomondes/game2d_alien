@@ -6,6 +6,8 @@ from bullet_manager import BulletManager
 from fleet_manager import FleetManager
 from game_events import GameEventHandler
 from game_renderer import GameRenderer
+from alien import Alien
+from fast_alien import FastAlien
 
 
 class AlienInvasion:
@@ -25,9 +27,10 @@ class AlienInvasion:
         self.bg_color = self.settings.bg_color
 
         self.bullet_manager = BulletManager(self.screen, self.settings, self.ship)
-        self.fleet_manager = FleetManager(self.screen, self.settings, self.ship)
+        self.fleet_manager = FleetManager(
+            self.screen, self.settings, self.ship, FastAlien
+        )
         self.event_handler = GameEventHandler(self.ship, self.bullet_manager)
-
         self.renderer = GameRenderer(
             self.screen,
             self.bg_color,
@@ -53,5 +56,5 @@ class AlienInvasion:
 
 
 if __name__ == "__main__":
-    alien_invasion = AlienInvasion()
-    alien_invasion.run_game()
+    ai = AlienInvasion()
+    ai.run_game()

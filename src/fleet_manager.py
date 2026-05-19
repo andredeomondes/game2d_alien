@@ -6,15 +6,16 @@ from alien import Alien
 class FleetManager:
     """Responsável por criar e gerenciar a frota de alienígenas."""
 
-    def __init__(self, screen, settings, ship) -> None:
+    def __init__(self, screen, settings, ship, alien_class=Alien) -> None:
         self.screen = screen
         self.settings = settings
         self.ship = ship
         self.aliens = pygame.sprite.Group()
+        self.alien_class = alien_class
 
     def create_fleet(self) -> None:
-        """Cria uma frota de alienígenas."""
-        alien = Alien(self.screen, self.settings)
+        """Cria uma frota completa de alienígenas."""
+        alien = self.alien_class(self.screen, self.settings)
         alien_width, alien_height = alien.rect.size
 
         available_space_x = self.settings.screen_width - (2 * alien_width)
@@ -28,12 +29,13 @@ class FleetManager:
 
         for row_number in range(number_rows):
             for alien_number in range(number_aliens_x):
-                self._create_alien(alien_number, row_number)
+                self._create_alien(alien_number, row_number, alien_width, alien_height)
 
-    def _create_alien(self, alien_number: int, row_number: int) -> None:
+    def _create_alien(
+        self, alien_number: int, row_number: int, alien_width: int, alien_height: int
+    ) -> None:
         """Cria um alienígena e o posiciona na linha."""
-        alien = Alien(self.screen, self.settings)
-        alien_width, alien_height = alien.rect.size
+        alien = self.alien_class(self.screen, self.settings)
         alien.x = alien_width + 2 * alien_width * alien_number
         alien.rect.x = alien.x
         alien.rect.y = alien_height + 2 * alien_height * row_number
