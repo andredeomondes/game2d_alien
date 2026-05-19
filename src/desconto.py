@@ -1,17 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class Pedido:
-    """Representa um pedido com um valor total."""
-
-    def __init__(self, valor: float) -> None:
-        self.valor = valor
-
-    def get_valor(self) -> float:
-        return self.valor
-
-
-class Desconto(ABC):
+class IDesconto(ABC):
     """Classe base para todos os tipos de desconto."""
 
     @abstractmethod
@@ -19,41 +9,36 @@ class Desconto(ABC):
         pass
 
 
-class DescontoFixo(Desconto):
+class Pedido:
+    """Representa um pedido com injeção de estratégia de desconto."""
+
+    def __init__(self, desconto: IDesconto) -> None:
+        self.desconto = desconto
+
+    def total(self, valor: float) -> float:
+        return valor - self.desconto.calcular(valor)
+
+
+class DescontoFixo(IDesconto):
     """Subtrai um valor fixo (ex: R$ 20,00 off)."""
 
     def __init__(self, valor_desconto: float) -> None:
         self.valor_desconto = valor_desconto
 
     def calcular(self, valor: float) -> float:
-        return valor - self.valor_desconto
+        return self.valor_desconto
 
 
-class DescontoPercentual(Desconto):
+class DescontoPercentual(IDesconto):
     """Subtrai uma porcentagem (ex: 10% off)."""
 
     def __init__(self, porcentagem: float) -> None:
         self.porcentagem = porcentagem
 
     def calcular(self, valor: float) -> float:
-        return valor * (1 - self.porcentagem / 100)
-
-
-class DescontoApp:
-    """Orquestra a aplicação do desconto sobre o pedido."""
-
-    def __init__(self, pedido: Pedido, desconto_estrategia: Desconto) -> None:
-        self.pedido = pedido
-        self.desconto_estrategia = desconto_estrategia
-
-    def calcular_total_com_desconto(self) -> float:
-        valor_original = self.pedido.get_valor()
-        return self.desconto_estrategia.calcular(valor_original)
+        return valor * (self.porcentagem / 100)
 
 
 if __name__ == "__main__":
-    meu_pedido = Pedido(500.0)
-    meu_desconto = DescontoPercentual(20)
-
-    app = DescontoApp(meu_pedido, meu_desconto)
-    print(f"Total a pagar: R$ {app.calcular_total_com_desconto()}")
+    meu_pedido = Pedido(DescontoPercentual(20))
+    print(f"Total a pagar: R$ {meu_pedido.total(500.0)}")
