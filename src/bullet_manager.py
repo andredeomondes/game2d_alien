@@ -21,7 +21,6 @@ class BulletManager:
         """Atualiza a posição dos projéteis e se livra dos projéteis antigos."""
         self.bullets.update()
         self._remove_offscreen_bullets()
-        self._check_bullet_alien_collisions(aliens)
 
     def _remove_offscreen_bullets(self) -> None:
         """Remove os projéteis que desapareceram da tela."""
@@ -29,6 +28,6 @@ class BulletManager:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
-    def _check_bullet_alien_collisions(self, aliens) -> None:
-        """Verifica colisões entre projéteis e alienígenas."""
-        pygame.sprite.groupcollide(self.bullets, aliens, True, True)
+    def _check_bullet_alien_collisions(self, aliens) -> dict:
+        """Verifica colisões entre projéteis e alienígenas e retorna as colisões."""
+        return pygame.sprite.groupcollide(self.bullets, aliens, True, True)
